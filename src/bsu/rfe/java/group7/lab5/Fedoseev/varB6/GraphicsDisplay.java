@@ -2,9 +2,7 @@ package bsu.rfe.java.group7.lab5.Fedoseev.varB6;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-//import java.awt.event.MouseAdapter;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
