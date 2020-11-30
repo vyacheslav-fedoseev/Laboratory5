@@ -16,7 +16,7 @@ import java.text.NumberFormat;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class GraphicsDisplay extends JPanel implements MouseMotionListener{
+public class GraphicsDisplay extends JPanel {
     // Список координат точек для построения графика
     private Double[][] graphicsData;
     // Флаговые переменные, задающие правила отображения графика
@@ -47,13 +47,13 @@ public class GraphicsDisplay extends JPanel implements MouseMotionListener{
     private Double[] chosenPoint = null;
 
     public GraphicsDisplay() {
-        addMouseMotionListener(this);
+        addMouseMotionListener(new TMouseMotionListener());
         // Цвет заднего фона области отображения - белый
         setBackground(Color.WHITE);
         // Сконструировать необходимые объекты, используемые в рисовании
         // Перо для рисования графика
         graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_ROUND, 10.0f, new float[] {2,1,1,1,1,1,1,1,2,1,1,1,2}, 0.0f);
+                BasicStroke.JOIN_ROUND, 10.0f, new float[]{2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2}, 0.0f);
         // Перо для рисования целой части графика
         graphicsIntStroke = new BasicStroke(3.0f, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_ROUND, 10.0f, null, 0.0f);
@@ -66,7 +66,7 @@ public class GraphicsDisplay extends JPanel implements MouseMotionListener{
         // Шрифт для подписей осей координат
         axisFont = new Font("Serif", Font.BOLD, 36);
         // Шрифт для подписи координат точки
-        coordinatesFont = new Font("Serif",Font.BOLD,20);
+        coordinatesFont = new Font("Serif", Font.BOLD, 20);
         formatter = (DecimalFormat) NumberFormat.getInstance();
         formatter.setMaximumFractionDigits(3);
         formatter.setGroupingUsed(false);
@@ -173,12 +173,12 @@ public class GraphicsDisplay extends JPanel implements MouseMotionListener{
         if (showIntGraphics) paintIntUnitOfGraphics(canvas);
         // Затем (если нужно) отображаются маркеры точек, по которым строился график.
         if (showMarkers) paintMarkers(canvas);
-        if (chosenPoint!= null) {
-           Point2D.Double point = xyToPoint(chosenPoint[0],chosenPoint[1]);
-           canvas.setFont(coordinatesFont);
-           canvas.setColor(Color.BLUE);
-           String str = "(" + formatter.format(chosenPoint[0]) + ";" + formatter.format(chosenPoint[1]) + ")";
-           canvas.drawString(str,(float)point.getX() + 5,(float)point.getY() - 7);
+        if (chosenPoint != null) {
+            Point2D.Double point = xyToPoint(chosenPoint[0], chosenPoint[1]);
+            canvas.setFont(coordinatesFont);
+            canvas.setColor(Color.BLUE);
+            String str = "(" + formatter.format(chosenPoint[0]) + ";" + formatter.format(chosenPoint[1]) + ")";
+            canvas.drawString(str, (float) point.getX() + 5, (float) point.getY() - 7);
         }
         // Шаг 9 - Восстановить старые настройки холста
         canvas.setFont(oldFont);
@@ -243,12 +243,13 @@ public class GraphicsDisplay extends JPanel implements MouseMotionListener{
     protected boolean isSumLessThanTen(Double[] point) {
         int valueFuncInt = point[1].intValue();
         int sum = 0;
-        while(valueFuncInt > 0) {
+        while (valueFuncInt > 0) {
             sum += valueFuncInt % 10;
             valueFuncInt /= 10;
         }
         return sum < 10 ? true : false;
     }
+
     // Отображение маркеров точек, по которым рисовался график
     protected void paintMarkers(Graphics2D canvas) {
         // Шаг 1 - Установить специальное перо для черчения контуров маркеров
@@ -260,35 +261,35 @@ public class GraphicsDisplay extends JPanel implements MouseMotionListener{
 
         // Шаг 2 - Организовать цикл по всем точкам графика
         for (Double[] point : graphicsData) {
-        if(isSumLessThanTen(point)) {
-            Point2D.Double center = xyToPoint(point[0], point[1]);
-            GeneralPath path = new GeneralPath();
-            path.moveTo(center.x + 0, center.y + 5);
-            path.lineTo(center.x - 1, center.y + 4);
-            path.lineTo(center.x - 1, center.y + 2);
-            path.lineTo(center.x - 2, center.y + 2);
-            path.lineTo(center.x - 3, center.y + 1);
-            path.lineTo(center.x - 4, center.y + 1);
-            path.lineTo(center.x - 5, center.y + 0);
-            path.lineTo(center.x - 4, center.y - 1);
-            path.lineTo(center.x - 3, center.y - 1);
-            path.lineTo(center.x - 2, center.y - 2);
-            path.lineTo(center.x - 1, center.y - 2);
-            path.lineTo(center.x - 1, center.y - 4);
-            path.lineTo(center.x + 0, center.y - 5);
-            path.lineTo(center.x + 1, center.y - 4);
-            path.lineTo(center.x + 1, center.y - 2);
-            path.lineTo(center.x + 2, center.y - 2);
-            path.lineTo(center.x + 3, center.y - 1);
-            path.lineTo(center.x + 4, center.y - 1);
-            path.lineTo(center.x + 5, center.y + 0);
-            path.lineTo(center.x + 4, center.y + 1);
-            path.lineTo(center.x + 3, center.y + 1);
-            path.lineTo(center.x + 2, center.y + 2);
-            path.lineTo(center.x + 1, center.y + 2);
-            path.lineTo(center.x + 1, center.y + 4);
-            path.lineTo(center.x + 0, center.y + 5);
-            canvas.draw(path);
+            if (isSumLessThanTen(point)) {
+                Point2D.Double center = xyToPoint(point[0], point[1]);
+                GeneralPath path = new GeneralPath();
+                path.moveTo(center.x + 0, center.y + 5);
+                path.lineTo(center.x - 1, center.y + 4);
+                path.lineTo(center.x - 1, center.y + 2);
+                path.lineTo(center.x - 2, center.y + 2);
+                path.lineTo(center.x - 3, center.y + 1);
+                path.lineTo(center.x - 4, center.y + 1);
+                path.lineTo(center.x - 5, center.y + 0);
+                path.lineTo(center.x - 4, center.y - 1);
+                path.lineTo(center.x - 3, center.y - 1);
+                path.lineTo(center.x - 2, center.y - 2);
+                path.lineTo(center.x - 1, center.y - 2);
+                path.lineTo(center.x - 1, center.y - 4);
+                path.lineTo(center.x + 0, center.y - 5);
+                path.lineTo(center.x + 1, center.y - 4);
+                path.lineTo(center.x + 1, center.y - 2);
+                path.lineTo(center.x + 2, center.y - 2);
+                path.lineTo(center.x + 3, center.y - 1);
+                path.lineTo(center.x + 4, center.y - 1);
+                path.lineTo(center.x + 5, center.y + 0);
+                path.lineTo(center.x + 4, center.y + 1);
+                path.lineTo(center.x + 3, center.y + 1);
+                path.lineTo(center.x + 2, center.y + 2);
+                path.lineTo(center.x + 1, center.y + 2);
+                path.lineTo(center.x + 1, center.y + 4);
+                path.lineTo(center.x + 0, center.y + 5);
+                canvas.draw(path);
             }
         }
     }
@@ -396,27 +397,30 @@ public class GraphicsDisplay extends JPanel implements MouseMotionListener{
         return dest;
     }
 
-    @Override
-    public void mouseDragged(MouseEvent e) {
+    private class TMouseMotionListener implements MouseMotionListener {
 
-    }
+        @Override
+        public void mouseDragged(MouseEvent e) {
 
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        setCursor(defaultCursor);
-        chosenPoint = null;
-        int mouseX = e.getX();
-        int mouseY = e.getY();
-        if (graphicsData != null) {
-            for (Double[] data : graphicsData ) {
-                Point2D.Double point = xyToPoint(data[0],data[1]);
-                if (Math.abs(mouseX-point.getX()) <= 5 && Math.abs(mouseY-point.getY()) <= 5) {
-                    chosenPoint = data;
-                    setCursor(pointCursor);
-                    break;
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            setCursor(defaultCursor);
+            chosenPoint = null;
+            int mouseX = e.getX();
+            int mouseY = e.getY();
+            if (graphicsData != null) {
+                for (Double[] data : graphicsData) {
+                    Point2D.Double point = xyToPoint(data[0], data[1]);
+                    if (Math.abs(mouseX - point.getX()) <= 5 && Math.abs(mouseY - point.getY()) <= 5) {
+                        chosenPoint = data;
+                        setCursor(pointCursor);
+                        break;
+                    }
                 }
             }
+            repaint();
         }
-        repaint();
     }
 }
