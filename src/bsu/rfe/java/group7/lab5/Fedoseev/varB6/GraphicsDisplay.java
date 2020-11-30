@@ -1,21 +1,22 @@
 package bsu.rfe.java.group7.lab5.Fedoseev.varB6;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+//import java.awt.event.MouseAdapter;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import javax.swing.JPanel;
+
 @SuppressWarnings("serial")
-public class GraphicsDisplay extends JPanel {
+public class GraphicsDisplay extends JPanel implements MouseMotionListener{
     // Список координат точек для построения графика
     private Double[][] graphicsData;
     // Флаговые переменные, задающие правила отображения графика
@@ -35,9 +36,18 @@ public class GraphicsDisplay extends JPanel {
     private BasicStroke markerStroke;
     private BasicStroke graphicsIntStroke;
     // Различные шрифты отображения надписей
-    private Font axisFont;
+    private final Font axisFont;
+    private final Font coordinatesFont;
+    // Для форматирования числа
+    private final DecimalFormat formatter;
+    // Переменные для работы с курсором
+    private final Cursor defaultCursor;
+    private final Cursor pointCursor;
+
+    private Double[] chosenPoint = null;
 
     public GraphicsDisplay() {
+        addMouseMotionListener(this);
         // Цвет заднего фона области отображения - белый
         setBackground(Color.WHITE);
         // Сконструировать необходимые объекты, используемые в рисовании
@@ -55,6 +65,17 @@ public class GraphicsDisplay extends JPanel {
                 BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
         // Шрифт для подписей осей координат
         axisFont = new Font("Serif", Font.BOLD, 36);
+        // Шрифт для подписи координат точки
+        coordinatesFont = new Font("Serif",Font.BOLD,20);
+        formatter = (DecimalFormat) NumberFormat.getInstance();
+        formatter.setMaximumFractionDigits(3);
+        formatter.setGroupingUsed(false);
+        DecimalFormatSymbols dottedDouble = formatter.getDecimalFormatSymbols();
+        dottedDouble.setDecimalSeparator('.');
+        formatter.setDecimalFormatSymbols(dottedDouble);
+        defaultCursor = getCursor();
+        pointCursor = new Cursor(Cursor.HAND_CURSOR);
+
     }
 
     // Данный метод вызывается из обработчика элемента меню "Открыть файл с графиком"
@@ -152,6 +173,13 @@ public class GraphicsDisplay extends JPanel {
         if (showIntGraphics) paintIntUnitOfGraphics(canvas);
         // Затем (если нужно) отображаются маркеры точек, по которым строился график.
         if (showMarkers) paintMarkers(canvas);
+        if (chosenPoint!= null) {
+           Point2D.Double point = xyToPoint(chosenPoint[0],chosenPoint[1]);
+           canvas.setFont(coordinatesFont);
+           canvas.setColor(Color.BLUE);
+           String str = "(" + formatter.format(chosenPoint[0]) + ";" + formatter.format(chosenPoint[1]) + ")";
+           canvas.drawString(str,(float)point.getX() + 5,(float)point.getY() - 7);
+        }
         // Шаг 9 - Восстановить старые настройки холста
         canvas.setFont(oldFont);
         canvas.setPaint(oldPaint);
@@ -366,5 +394,29 @@ public class GraphicsDisplay extends JPanel {
         // Задать еѐ координаты как координаты существующей точки + заданные смещения
         dest.setLocation(src.getX() + deltaX, src.getY() + deltaY);
         return dest;
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        setCursor(defaultCursor);
+        chosenPoint = null;
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+        if (graphicsData != null) {
+            for (Double[] data : graphicsData ) {
+                Point2D.Double point = xyToPoint(data[0],data[1]);
+                if (Math.abs(mouseX-point.getX()) <= 5 && Math.abs(mouseY-point.getY()) <= 5) {
+                    chosenPoint = data;
+                    setCursor(pointCursor);
+                    break;
+                }
+            }
+        }
+        repaint();
     }
 }
